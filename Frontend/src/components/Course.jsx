@@ -17,10 +17,10 @@ function Course() {
         setLoading(true);
         setError("");
 
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL ?? "http://https://bookstore-u7zc.onrender.com"}/book`,
-          { signal: controller.signal }
-        );
+        const apiUrl = import.meta.env.VITE_API_URL || "https://bookstore-u7zc.onrender.com";
+        const res = await axios.get(`${apiUrl.replace(/\/$/, "")}/book`, {
+          signal: controller.signal,
+        });
 
         setBooks(res.data);
       } catch (err) {

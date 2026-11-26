@@ -21,7 +21,8 @@ function Freebook() {
         setLoading(true);
         setError("");
 
-       const apiUrl = "https://bookstore-f4rt.onrender.com";
+        // Correct Render backend URL
+        const apiUrl = "https://bookstore-u7zc.onrender.com";
 
         const res = await axios.get(`${apiUrl}/book`, {
           signal: controller.signal,
@@ -32,14 +33,19 @@ function Freebook() {
         }
 
         const data = res.data.filter(
-          (item) => item.category === "Free"
+          (item) => item.category?.trim().toLowerCase() === "free"
         );
 
+        console.log("All Books:", res.data);
         console.log("Free Books:", data);
 
         setBook(data);
+
       } catch (error) {
-        if (error.name === "CanceledError") return;
+        if (
+          error.name === "CanceledError" ||
+          axios.isCancel(error)
+        ) return;
 
         console.error(
           "Error fetching free books:",
@@ -50,6 +56,7 @@ function Freebook() {
           error.response?.data?.message ||
           "Unable to load free books. Please try again later."
         );
+
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
@@ -59,9 +66,7 @@ function Freebook() {
 
     getBook();
 
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, []);
 
   const settings = {
@@ -70,15 +75,12 @@ function Freebook() {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 3,
-    initialSlide: 0,
     responsive: [
       {
         breakpoint: 1024,
         settings: {
           slidesToShow: 3,
           slidesToScroll: 3,
-          infinite: true,
-          dots: true,
         },
       },
       {
@@ -86,7 +88,6 @@ function Freebook() {
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
-          initialSlide: 0,
         },
       },
       {
@@ -116,7 +117,6 @@ function Freebook() {
       </div>
 
       <div className="mt-6">
-
         {loading ? (
           <p className="text-center mt-8">
             Loading free books...
@@ -136,8 +136,8 @@ function Freebook() {
             No free books available at the moment.
           </p>
         )}
-
       </div>
+
     </div>
   );
 }

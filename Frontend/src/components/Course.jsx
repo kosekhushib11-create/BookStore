@@ -1,7 +1,7 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
 import Cards from "./Cards";
 
 function Course() {
@@ -17,22 +17,40 @@ function Course() {
         setLoading(true);
         setError("");
 
-        const apiUrl = import.meta.env.VITE_API_URL || "https://bookstore-u7zc.onrender.com";
-        const res = await axios.get(`${apiUrl.replace(/\/$/, "")}/book`, {
+        const apiUrl = (
+          import.meta.env.VITE_API_URL ||
+          "https://bookstore-u7zc.onrender.com"
+        ).replace(/\/$/, "");
+
+        const res = await axios.get(`${apiUrl}/book`, {
           signal: controller.signal,
         });
 
-        setBooks(res.data);
-      } catch (err) {
-        if (!axios.isCancel(err)) {
-          setError(
-            err.response?.data?.message ||
-              err.message ||
-              "Unable to load books."
-          );
+        if (!Array.isArray(res.data)) {
+          throw new Error("Invalid books response from server");
         }
+
+        console.log("All Books:", res.data);
+        setBooks(res.data);
+
+      } catch (err) {
+        if (
+          err.name === "CanceledError" ||
+          axios.isCancel(err)
+        ) return;
+
+        console.error("Course Books Error:", err);
+
+        setError(
+          err.response?.data?.message ||
+          err.message ||
+          "Unable to load books."
+        );
+
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -43,15 +61,16 @@ function Course() {
 
   return (
     <main className="max-w-screen-2xl container mx-auto px-4 md:px-20">
+
       <div className="mt-28 text-center">
         <h1 className="text-2xl md:text-4xl">
-          We&apos;re delighted to have you{" "}
+          We're delighted to have you{" "}
           <span className="text-pink-500">Here! :)</span>
         </h1>
 
         <p className="mt-12">
           Explore our collection of books and discover something new to read.
-          Whether you&apos;re looking to learn new skills, improve your
+          Whether you're looking to learn new skills, improve your
           knowledge, or enjoy an interesting story, we have books for different
           interests and learning needs. Browse our collection, find your
           favourite books, and make learning an enjoyable experience.
@@ -66,15 +85,17 @@ function Course() {
       </div>
 
       {loading ? (
-        <p className="mt-12 text-center" role="status">
-          Loading books…
+        <p className="mt-12 text-center">
+          Loading books...
         </p>
       ) : error ? (
-        <p className="mt-12 text-center text-red-500" role="alert">
+        <p className="mt-12 text-center text-red-500">
           {error}
         </p>
       ) : books.length === 0 ? (
-        <p className="mt-12 text-center">No books available.</p>
+        <p className="mt-12 text-center">
+          No books available.
+        </p>
       ) : (
         <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-4">
           {books.map((book) => (
@@ -82,6 +103,7 @@ function Course() {
           ))}
         </div>
       )}
+
     </main>
   );
 }

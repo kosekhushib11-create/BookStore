@@ -18,7 +18,7 @@ function Course() {
         setError("");
 
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL ?? "http://localhost:5000"}/book`,
+          `${import.meta.env.VITE_API_URL ?? "http://https://bookstore-u7zc.onrender.com"}/book`,
           { signal: controller.signal }
         );
 

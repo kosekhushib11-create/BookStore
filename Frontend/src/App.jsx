@@ -1,33 +1,51 @@
+
 import React from "react";
-import Home from "./home/Home";
 import { Navigate, Route, Routes } from "react-router-dom";
+
+import Home from "./home/Home";
 import Courses from "./courses/Courses";
 import Signup from "./components/Signup";
 import Contact from "./components/Contact";
 import About from "./components/About";
+
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "./context/AuthProvider";
 
 function App() {
-  const [authUser, setAuthUser] = useAuth();
-  console.log(authUser);
-  return (
-    <>
-      <div className="dark:bg-slate-900 dark:text-white">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/course"
-            element={authUser ? <Courses /> : <Navigate to="/signup" />}
-          />
+  const [authUser] = useAuth();
 
-          <Route path="/Contact" element={<Contact />} />
-          <Route path="/About" element={<About />} />
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
-        <Toaster />
-      </div>
-    </>
+  return (
+    <div className="dark:bg-slate-900 dark:text-white min-h-screen">
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+
+        {/* Courses accessible without login */}
+        <Route path="/course" element={<Courses />} />
+
+        {/* Other pages */}
+        <Route path="/Contact" element={<Contact />} />
+        <Route path="/About" element={<About />} />
+
+        {/* Signup */}
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Login redirects to homepage where login popup is available */}
+        <Route
+          path="/login"
+          element={<Navigate to="/" replace />}
+        />
+
+        {/* Unknown routes */}
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+      </Routes>
+
+      <Toaster position="top-right" />
+
+    </div>
   );
 }
 

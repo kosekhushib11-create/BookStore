@@ -10,27 +10,61 @@ import Cards from "./Cards";
 
 function Freebook() {
   const [book, setBook] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const getBook = async () => {
       try {
-        const res = await axios.get("https://bookstore-u7zc.onrender.com/book");
+        setLoading(true);
+        setError("");
+
+        const apiUrl = (
+          import.meta.env.VITE_API_URL ||
+          "https://bookstore-u7zc.onrender.com"
+        ).replace(/\/$/, "");
+
+        const res = await axios.get(`${apiUrl}/book`, {
+          signal: controller.signal,
+        });
+
+        if (!Array.isArray(res.data)) {
+          throw new Error("Invalid response received from server");
+        }
 
         const data = res.data.filter(
           (item) => item.category === "Free"
         );
 
         console.log("Free Books:", data);
+
         setBook(data);
       } catch (error) {
+        if (error.name === "CanceledError") return;
+
         console.error(
           "Error fetching free books:",
           error.response?.data || error.message
         );
+
+        setError(
+          error.response?.data?.message ||
+          "Unable to load free books. Please try again later."
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     getBook();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const settings = {
@@ -85,7 +119,16 @@ function Freebook() {
       </div>
 
       <div className="mt-6">
-        {book.length > 0 ? (
+
+        {loading ? (
+          <p className="text-center mt-8">
+            Loading free books...
+          </p>
+        ) : error ? (
+          <p className="text-center mt-8 text-red-500">
+            {error}
+          </p>
+        ) : book.length > 0 ? (
           <Slider {...settings}>
             {book.map((item) => (
               <Cards item={item} key={item._id} />
@@ -96,8 +139,8 @@ function Freebook() {
             No free books available at the moment.
           </p>
         )}
-      </div>
 
+      </div>
     </div>
   );
 }

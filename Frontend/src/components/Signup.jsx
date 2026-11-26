@@ -5,11 +5,13 @@ import Login from "./Login";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthProvider";
 
 function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
+  const [authUser, setAuthUser] = useAuth();
 
   const {
     register,
@@ -25,23 +27,32 @@ function Signup() {
     };
 
     try {
+      const API_URL =
+        import.meta.env.VITE_API_URL ||
+        "https://bookstore-u7zc.onrender.com";
+
       const res = await axios.post(
-        "http://localhost:5000/user/signup",
+        `${API_URL}/user/signup`,
         userInfo
       );
 
       console.log("Signup Response:", res.data);
 
-      if (res.data) {
+      if (res.data && res.data.user) {
         localStorage.setItem("Users", JSON.stringify(res.data.user));
-        toast.success("Signup Successfully");
+        setAuthUser(res.data.user);
+
+        toast.success("Signup successful!");
         navigate(from, { replace: true });
+      } else {
+        toast.error(res.data.message || "Signup response is invalid");
       }
     } catch (err) {
-      console.log("Signup Error:", err);
+      console.log("Signup Error:", err.response?.data || err);
 
       toast.error(
-        err.response?.data?.message || "Signup failed. Please try again."
+        err.response?.data?.message ||
+        "Signup failed. Please try again."
       );
     }
   };
@@ -50,7 +61,6 @@ function Signup() {
     <div className="flex h-screen items-center justify-center">
       <div className="w-[600px]">
         <div className="modal-box">
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <Link
               to="/"
@@ -61,7 +71,6 @@ function Signup() {
 
             <h3 className="font-bold text-lg">Signup</h3>
 
-            {/* Name */}
             <div className="mt-4 space-y-2">
               <span>Name</span>
               <br />
@@ -69,17 +78,15 @@ function Signup() {
                 type="text"
                 placeholder="Enter your fullname"
                 className="w-80 px-3 py-1 border rounded-md outline-none"
-                {...register("fullname", { required: true })}
+                {...register("fullname", { required: "Name is required" })}
               />
-              <br />
               {errors.fullname && (
-                <span className="text-sm text-red-500">
-                  This field is required
-                </span>
+                <p className="text-sm text-red-500">
+                  {errors.fullname.message}
+                </p>
               )}
             </div>
 
-            {/* Email */}
             <div className="mt-4 space-y-2">
               <span>Email</span>
               <br />
@@ -87,17 +94,15 @@ function Signup() {
                 type="email"
                 placeholder="Enter your email"
                 className="w-80 px-3 py-1 border rounded-md outline-none"
-                {...register("email", { required: true })}
+                {...register("email", { required: "Email is required" })}
               />
-              <br />
               {errors.email && (
-                <span className="text-sm text-red-500">
-                  This field is required
-                </span>
+                <p className="text-sm text-red-500">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
-            {/* Password */}
             <div className="mt-4 space-y-2">
               <span>Password</span>
               <br />
@@ -105,17 +110,21 @@ function Signup() {
                 type="password"
                 placeholder="Enter your password"
                 className="w-80 px-3 py-1 border rounded-md outline-none"
-                {...register("password", { required: true })}
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
+                })}
               />
-              <br />
               {errors.password && (
-                <span className="text-sm text-red-500">
-                  This field is required
-                </span>
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
-            {/* Button */}
             <div className="flex justify-around mt-4">
               <button
                 type="submit"
@@ -124,23 +133,21 @@ function Signup() {
                 Signup
               </button>
 
-              <p className="text-xl">
-                Have account?{" "}
+              <p>
+                Have an account?{" "}
                 <button
                   type="button"
                   className="underline text-blue-500 cursor-pointer"
                   onClick={() =>
-                    document.getElementById("my_modal_3").showModal()
+                    document.getElementById("my_modal_3")?.showModal()
                   }
                 >
                   Login
                 </button>
-
                 <Login />
               </p>
             </div>
           </form>
-
         </div>
       </div>
     </div>

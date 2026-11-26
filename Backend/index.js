@@ -12,33 +12,44 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: "https://bookstore-1-g3jg.onrender.com",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
-
-// MongoDB connection
 const URI = process.env.MONGO_URI;
 
-if (!URI) {
-    console.error("MongoDB URI is missing!");
-    process.exit(1);
-}
+// Health check
+app.get("/", (req, res) => {
+    res.send("BookStore Backend is running!");
+});
 
-try {
-    await mongoose.connect(URI);
-    console.log("Connected to MongoDB successfully!");
+// Routes
+app.use("/book", bookRoute);
+app.use("/user", userRoute);
+app.use("/order", orderRoute);
 
-    // Defining routes
-    app.use("/book", bookRoute);
-    app.use("/user", userRoute);
-    app.use("/order", orderRoute);
+const startServer = async () => {
+    try {
+        if (!URI) {
+            throw new Error("MongoDB URI is missing!");
+        }
 
-    app.listen(PORT, () => {
-        console.log(`Server is listening on port ${PORT}`);
-    });
+        await mongoose.connect(URI);
+        console.log("Connected to MongoDB successfully!");
 
-} catch (error) {
-    console.error("MongoDB Connection Error:", error);
-    process.exit(1);
-}
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+
+    } catch (error) {
+        console.error("Server Error:", error.message);
+        process.exit(1);
+    }
+};
+
+startServer();

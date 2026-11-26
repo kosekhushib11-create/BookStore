@@ -43,9 +43,9 @@ function Navbar() {
   const navItems = (
     <>
       <li><Link to="/">Home</Link></li>
-      <li><Link to="/course">Course</Link></li>
-      <li><Link to="/contact">Contact</Link></li>
-      <li><Link to="/about">About</Link></li>
+      <li><Link to="/Course">Course</Link></li>
+      <li><Link to="/Contact">Contact</Link></li>
+      <li><Link to="/About">About</Link></li>
     </>
   );
 

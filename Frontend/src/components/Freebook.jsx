@@ -21,10 +21,7 @@ function Freebook() {
         setLoading(true);
         setError("");
 
-        const apiUrl = (
-          import.meta.env.VITE_API_URL ||
-          "https://bookstore-u7zc.onrender.com"
-        ).replace(/\/$/, "");
+       const apiUrl = "https://bookstore-f4rt.onrender.com";
 
         const res = await axios.get(`${apiUrl}/book`, {
           signal: controller.signal,

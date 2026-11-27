@@ -20,7 +20,6 @@ app.use(cors({
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
 const URI = process.env.MONGO_URI;
 
 // Health check
@@ -28,28 +27,48 @@ app.get("/", (req, res) => {
     res.send("BookStore Backend is running!");
 });
 
-// Routes
-app.use("/book", bookRoute);
-app.use("/user", userRoute);
-app.use("/order", orderRoute);
+// MongoDB connection
+let connectionPromise;
 
-const startServer = async () => {
+const connectDB = async () => {
+    if (mongoose.connection.readyState === 1) {
+        return;
+    }
+
+    if (!connectionPromise) {
+        connectionPromise = mongoose.connect(URI)
+            .catch((error) => {
+                connectionPromise = null;
+                throw error;
+            });
+    }
+
+    await connectionPromise;
+};
+
+// Connect to MongoDB before API requests
+app.use(async (req, res, next) => {
     try {
         if (!URI) {
             throw new Error("MongoDB URI is missing!");
         }
 
-        await mongoose.connect(URI);
-        console.log("Connected to MongoDB successfully!");
-
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
+        await connectDB();
+        next();
 
     } catch (error) {
-        console.error("Server Error:", error.message);
-        process.exit(1);
-    }
-};
+        console.error("MongoDB Connection Error:", error.message);
 
-startServer();
+        res.status(500).json({
+            message: "Database connection failed"
+        });
+    }
+});
+
+// Routes
+app.use("/book", bookRoute);
+app.use("/user", userRoute);
+app.use("/order", orderRoute);
+
+// Export Express app for Vercel
+export default app;

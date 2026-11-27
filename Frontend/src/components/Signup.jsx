@@ -144,7 +144,7 @@ function Signup() {
                 >
                   Login
                 </button>
-                <Login />
+                
               </p>
             </div>
           </form>

@@ -12,62 +12,62 @@ dotenv.config();
 
 const app = express();
 
-// ===============================
-// CORS CONFIGURATION
-// ===============================
-
+// Allowed frontend domains
 const allowedOrigins = [
   "https://jovial-gumption-5dc17a.netlify.app",
-  "http://localhost:5173"
+  "https://bookstore-1-g3jg.onrender.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
 ];
 
+// CORS configuration
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.error("Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS: " + origin));
+        console.log("Blocked CORS origin:", origin);
+        callback(new Error("Not allowed by CORS"));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
+    credentials: true,
   })
 );
 
-// Handle preflight requests
-app.options(/.*/, cors());
-
-// ===============================
-// MIDDLEWARE
-// ===============================
-
+// Middleware
 app.use(express.json());
 
-// ===============================
-// MONGODB CONNECTION
-// ===============================
-
+// MongoDB URI
 const URI = process.env.MONGO_URI;
 
-let connectionPromise;
+// Health check
+app.get("/", (req, res) => {
+  res.status(200).send("BookStore Backend is running!");
+});
+
+// MongoDB connection
+let connectionPromise = null;
 
 const connectDB = async () => {
-  if (mongoose.connection.readyState === 1) {
-    return;
+  if (!URI) {
+    throw new Error("MONGO_URI is missing in environment variables");
   }
 
-  if (!URI) {
-    throw new Error("MongoDB URI is missing!");
+  if (mongoose.connection.readyState === 1) {
+    return;
   }
 
   if (!connectionPromise) {
     connectionPromise = mongoose
       .connect(URI)
+      .then(() => {
+        console.log("MongoDB connected successfully!");
+      })
       .catch((error) => {
         connectionPromise = null;
+        console.error("MongoDB connection error:", error.message);
         throw error;
       });
   }
@@ -75,42 +75,36 @@ const connectDB = async () => {
   await connectionPromise;
 };
 
-// Connect to MongoDB before API requests
+// Database middleware
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
   } catch (error) {
-    console.error("MongoDB Connection Error:", error.message);
+    console.error("Database Connection Error:", error.message);
 
     res.status(500).json({
-      message: "Database connection failed"
+      message: "Database connection failed",
+      error: error.message,
     });
   }
 });
 
-// ===============================
-// HEALTH CHECK
-// ===============================
-
-app.get("/", (req, res) => {
-  res.send("BookStore Backend is running!");
-});
-
-// ===============================
-// API ROUTES
-// ===============================
-
+// API Routes
 app.use("/book", bookRoute);
 app.use("/user", userRoute);
 app.use("/order", orderRoute);
 
-// ===============================
-// SERVER
-// ===============================
+// Invalid route handler
+app.use((req, res) => {
+  res.status(404).json({
+    message: "API route not found",
+  });
+});
 
-const PORT = process.env.PORT || 4001;
+// Start Render server
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`BookStore Backend running on port ${PORT}`);
+  console.log(`BookStore server running on port ${PORT}`);
 });

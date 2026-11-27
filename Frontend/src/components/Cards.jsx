@@ -1,34 +1,37 @@
 
-import React from "react";
+import React, { useState } from "react";
 
 function Cards({ item }) {
+  const [imageError, setImageError] = useState(false);
+
   const handleBuyNow = () => {
     document.getElementById("my_modal_3")?.showModal();
   };
 
-  const handleImageError = (e) => {
-    e.currentTarget.onerror = null;
-    e.currentTarget.src =
-      "https://placehold.co/400x600?text=Book+Cover";
-  };
+  const fallbackImage =
+    "https://placehold.co/400x600/e2e8f0/334155?text=Book+Cover";
 
   return (
     <div className="mt-4 my-3 p-3">
-      <div className="card w-80 bg-base-100 shadow-xl hover:scale-105 duration-200 dark:bg-slate-900 dark:text-white dark:border">
+      <div className="card w-full bg-base-100 shadow-xl hover:scale-105 duration-200 dark:bg-slate-900 dark:text-white dark:border">
 
-        <figure className="w-full h-64 bg-white overflow-hidden">
+        <figure className="h-64 overflow-hidden bg-gray-100">
           <img
-            src={item.image}
-            alt={item.title || item.name || "Book cover"}
-            onError={handleImageError}
-            loading="lazy"
-            className="w-full h-full object-contain"
+            src={
+              !imageError && item.image
+                ? item.image
+                : fallbackImage
+            }
+            alt={item.name || "Book"}
+            className="h-full w-full object-contain"
+            onError={() => setImageError(true)}
           />
         </figure>
 
         <div className="card-body">
-          <h2 className="card-title">
+          <h2 className="card-title flex-wrap">
             {item.name}
+
             <div className="badge badge-secondary">
               {item.category}
             </div>
@@ -50,6 +53,7 @@ function Cards({ item }) {
             </button>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -12,66 +12,105 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    origin: [
-        "https://jovial-gumption-5dc17a.netlify.app",
-        "http://localhost:5173"
-    ],
+// ===============================
+// CORS CONFIGURATION
+// ===============================
+
+const allowedOrigins = [
+  "https://jovial-gumption-5dc17a.netlify.app",
+  "http://localhost:5173"
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.error("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
-}));
+  })
+);
+
+// Handle preflight requests
+app.options(/.*/, cors());
+
+// ===============================
+// MIDDLEWARE
+// ===============================
 
 app.use(express.json());
 
+// ===============================
+// MONGODB CONNECTION
+// ===============================
+
 const URI = process.env.MONGO_URI;
 
-// Health check
-app.get("/", (req, res) => {
-    res.send("BookStore Backend is running!");
-});
-
-// MongoDB connection
 let connectionPromise;
 
 const connectDB = async () => {
-    if (mongoose.connection.readyState === 1) {
-        return;
-    }
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
 
-    if (!connectionPromise) {
-        connectionPromise = mongoose.connect(URI)
-            .catch((error) => {
-                connectionPromise = null;
-                throw error;
-            });
-    }
+  if (!URI) {
+    throw new Error("MongoDB URI is missing!");
+  }
 
-    await connectionPromise;
+  if (!connectionPromise) {
+    connectionPromise = mongoose
+      .connect(URI)
+      .catch((error) => {
+        connectionPromise = null;
+        throw error;
+      });
+  }
+
+  await connectionPromise;
 };
 
 // Connect to MongoDB before API requests
 app.use(async (req, res, next) => {
-    try {
-        if (!URI) {
-            throw new Error("MongoDB URI is missing!");
-        }
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("MongoDB Connection Error:", error.message);
 
-        await connectDB();
-        next();
-
-    } catch (error) {
-        console.error("MongoDB Connection Error:", error.message);
-
-        res.status(500).json({
-            message: "Database connection failed"
-        });
-    }
+    res.status(500).json({
+      message: "Database connection failed"
+    });
+  }
 });
 
-// Routes
+// ===============================
+// HEALTH CHECK
+// ===============================
+
+app.get("/", (req, res) => {
+  res.send("BookStore Backend is running!");
+});
+
+// ===============================
+// API ROUTES
+// ===============================
+
 app.use("/book", bookRoute);
 app.use("/user", userRoute);
 app.use("/order", orderRoute);
 
-// Export Express app for Vercel
-export default app;
+// ===============================
+// SERVER
+// ===============================
+
+const PORT = process.env.PORT || 4001;
+
+app.listen(PORT, () => {
+  console.log(`BookStore Backend running on port ${PORT}`);
+});

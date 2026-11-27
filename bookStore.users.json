@@ -1,0 +1,9 @@
+[{
+  "_id": {
+    "$oid": "6b06d3da98a5fffba3c90ff1"
+  },
+  "fullname": "Khushi Kose",
+  "email": "khushi@gmail.com",
+  "password": "$2a$10$j6gWD4HlBhgrMSKc673adOrRahPb89G2n3IKRgS5U9jkMtEvS3/0q",
+  "__v": 0
+}]

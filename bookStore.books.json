@@ -1,0 +1,120 @@
+[{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6f3"
+  },
+  "name": "The Alchemist",
+  "price": 0,
+  "category": "Free",
+  "image": "https://covers.openlibrary.org/b/id/8231856-L.jpg",
+  "title": "A beautiful story about dreams, courage and discovering your destiny."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6f4"
+  },
+  "name": "Atomic Habits",
+  "price": 0,
+  "category": "Free",
+  "image": "https://covers.openlibrary.org/b/id/12547191-L.jpg",
+  "title": "Learn how small daily habits can create remarkable results."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6f5"
+  },
+  "name": "Rich Dad Poor Dad",
+  "price": 0,
+  "category": "Free",
+  "image": "https://covers.openlibrary.org/b/id/12547191-L.jpg",
+  "title": "Understand financial education, investing and wealth creation."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6f6"
+  },
+  "name": "The Psychology of Money",
+  "price": 449,
+  "category": "Popular",
+  "image": "https://covers.openlibrary.org/b/id/10523338-L.jpg",
+  "title": "Explore how people think about money, saving and investing."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6f7"
+  },
+  "name": "Think and Grow Rich",
+  "price": 299,
+  "category": "Business",
+  "image": "https://covers.openlibrary.org/b/id/12645154-L.jpg",
+  "title": "Discover principles of success, motivation and personal achievement."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6f8"
+  },
+  "name": "Ikigai",
+  "price": 249,
+  "category": "Free",
+  "image": "https://covers.openlibrary.org/b/id/8370226-L.jpg",
+  "title": "Explore the Japanese philosophy of finding purpose and happiness."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6f9"
+  },
+  "name": "Deep Work",
+  "price": 399,
+  "category": "Productivity",
+  "image": "https://covers.openlibrary.org/b/id/8370226-L.jpg",
+  "title": "Improve your focus and develop meaningful working habits."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6fa"
+  },
+  "name": "The Power of Your Subconscious Mind",
+  "price": 299,
+  "category": "Self Help",
+  "image": "https://covers.openlibrary.org/b/id/10521270-L.jpg",
+  "title": "Learn about positive thinking and the power of your mind."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6fb"
+  },
+  "name": "Wings of Fire",
+  "price": 350,
+  "category": "Biography",
+  "image": "https://covers.openlibrary.org/b/id/12645154-L.jpg",
+  "title": "An inspiring autobiography about dreams, dedication and achievement."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6fc"
+  },
+  "name": "The 5 AM Club",
+  "price": 399,
+  "category": "Productivity",
+  "image": "https://covers.openlibrary.org/b/id/8370226-L.jpg",
+  "title": "Discover routines for personal growth and productive mornings."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6fd"
+  },
+  "name": "Pride and Prejudice",
+  "price": 199,
+  "category": "Free",
+  "image": "https://covers.openlibrary.org/b/id/8225261-L.jpg",
+  "title": "Enjoy a classic novel about love, relationships and society."
+},
+{
+  "_id": {
+    "$oid": "6b06e192faa90862f0efd6fe"
+  },
+  "name": "Clean Code",
+  "price": 599,
+  "category": "Programming",
+  "image": "https://covers.openlibrary.org/b/id/10521270-L.jpg",
+  "title": "Learn principles and practices for writing readable software."
+}]

@@ -13,8 +13,11 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: "https://bookstore-1-g3jg.onrender.com",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: [
+        "https://jovial-gumption-5dc17a.netlify.app",
+        "http://localhost:5173"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
 }));
 

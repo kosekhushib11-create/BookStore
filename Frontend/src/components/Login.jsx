@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthProvider";
 
 function Login() {
-  const [authUser, setAuthUser] = useAuth();
+  const [, setAuthUser] = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -18,39 +18,33 @@ function Login() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    const userInfo = {
-      email: data.email,
-      password: data.password,
-    };
-
     try {
       setLoading(true);
 
-      const API = import.meta.env.VITE_API_URL ||
+      const API =
+        import.meta.env.VITE_API_URL ||
         "https://bookstore-u7zc.onrender.com";
 
       const res = await axios.post(
-        `${API}/user/login`,
-        userInfo
+        `${API.replace(/\/$/, "")}/user/login`,
+        {
+          email: data.email,
+          password: data.password,
+        },
+        { timeout: 20000 }
       );
 
       if (res.data && res.data.user) {
-        localStorage.setItem(
-          "Users",
-          JSON.stringify(res.data.user)
-        );
-
+        localStorage.setItem("Users", JSON.stringify(res.data.user));
         setAuthUser(res.data.user);
 
         toast.success("Logged in successfully!");
 
         document.getElementById("my_modal_3")?.close();
-
         navigate("/");
       } else {
-        toast.error(res.data.message || "Invalid login response");
+        toast.error(res.data?.message || "Invalid login response");
       }
-
     } catch (error) {
       console.error("Login Error:", error);
 
@@ -64,12 +58,22 @@ function Login() {
   };
 
   return (
-    <div>
+    <>
+      {/* Visible Login button */}
+      <button
+        type="button"
+        className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-700"
+        onClick={() =>
+          document.getElementById("my_modal_3")?.showModal()
+        }
+      >
+        Login
+      </button>
+
+      {/* Login dialog */}
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box">
-
           <form onSubmit={handleSubmit(onSubmit)}>
-
             <button
               type="button"
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -83,47 +87,44 @@ function Login() {
             <h3 className="font-bold text-lg">Login</h3>
 
             <div className="mt-4 space-y-2">
-              <span>Email</span>
+              <label>Email</label>
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-full px-3 py-2 border rounded-md outline-none"
+                className="w-full px-3 py-2 border rounded-md"
                 {...register("email", {
-                  required: "Email is required"
+                  required: "Email is required",
                 })}
               />
-
               {errors.email && (
-                <span className="text-sm text-red-500">
+                <p className="text-sm text-red-500">
                   {errors.email.message}
-                </span>
+                </p>
               )}
             </div>
 
             <div className="mt-4 space-y-2">
-              <span>Password</span>
+              <label>Password</label>
               <input
                 type="password"
                 placeholder="Enter your password"
-                className="w-full px-3 py-2 border rounded-md outline-none"
+                className="w-full px-3 py-2 border rounded-md"
                 {...register("password", {
-                  required: "Password is required"
+                  required: "Password is required",
                 })}
               />
-
               {errors.password && (
-                <span className="text-sm text-red-500">
+                <p className="text-sm text-red-500">
                   {errors.password.message}
-                </span>
+                </p>
               )}
             </div>
 
             <div className="flex justify-around items-center mt-6">
-
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-pink-500 text-white rounded-md px-4 py-2 hover:bg-pink-700 disabled:opacity-50"
+                className="bg-pink-500 text-white rounded-md px-4 py-2 hover:bg-pink-700"
               >
                 {loading ? "Logging in..." : "Login"}
               </button>
@@ -140,12 +141,11 @@ function Login() {
                   Signup
                 </Link>
               </p>
-
             </div>
           </form>
         </div>
       </dialog>
-    </div>
+    </>
   );
 }
 
